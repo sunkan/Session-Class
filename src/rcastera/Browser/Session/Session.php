@@ -29,7 +29,7 @@ class Session
      */
     public function __construct()
     {
-        session_start();
+        $this->session_start();
     }
 
     /**
@@ -136,13 +136,7 @@ class Session
      */
     private function timeNow()
     {
-        $currentHour = date('H');
-        $currentMin = date('i');
-        $currentSec = date('s');
-        $currentMon = date('m');
-        $currentDay = date('d');
-        $currentYear = date('y');
-        return mktime($currentHour, $currentMin, $currentSec, $currentMon, $currentDay, $currentYear);
+        return time();
     }
 
     /**
@@ -152,13 +146,7 @@ class Session
      */
     private function newTime()
     {
-        $currentHour = date('H');
-        $currentMin = date('i');
-        $currentSec = date('s');
-        $currentMon = date('m');
-        $currentDay = date('d');
-        $currentYear = date('y');
-        return mktime($currentHour, ($currentMin + $_SESSION['session_time']), $currentSec, $currentMon, $currentDay, $currentYear);
+        return strtotime('+'.$_SESSION['session_time'].' min');
     }
 
     /**
@@ -168,5 +156,23 @@ class Session
     {
         session_destroy();
         $_SESSION = array();
+    }
+
+
+    private function session_start()
+    {
+          $sn = session_name();
+          if (isset($_COOKIE[$sn])) {
+              $sessid = $_COOKIE[$sn];
+          } else if (isset($_GET[$sn])) {
+              $sessid = $_GET[$sn];
+          } else {
+              return session_start();
+          }
+
+         if (!preg_match('/^[a-zA-Z0-9,\-]{22,40}$/', $sessid)) {
+              return false;
+          }
+          return session_start();
     }
 }
